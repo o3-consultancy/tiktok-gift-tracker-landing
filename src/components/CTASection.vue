@@ -10,9 +10,9 @@
       </p>
       
       <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-        <button class="btn-primary text-lg px-8 py-4 bg-white text-primary-600 hover:bg-gray-100">
-          Start Your Free Trial
-        </button>
+        <a href="#pricing" class="btn-primary text-lg px-8 py-4 bg-white text-primary-600 hover:bg-gray-100 inline-block text-center">
+          Get Started
+        </a>
         <button class="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-600">
           Schedule a Demo
         </button>

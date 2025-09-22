@@ -20,7 +20,7 @@
               <span class="text-4xl font-bold text-gray-900">$30</span>
               <span class="text-gray-600">/month</span>
             </div>
-            <button class="btn-outline w-full">Start Free Trial</button>
+            <button class="btn-outline w-full">Subscribe</button>
           </div>
           
           <div class="space-y-4 mb-8">
@@ -76,7 +76,7 @@
               <span class="text-4xl font-bold text-gray-900">$80</span>
               <span class="text-gray-600">/month</span>
             </div>
-            <button class="btn-primary w-full">Start Free Trial</button>
+            <button class="btn-primary w-full">Subscribe</button>
           </div>
           
           <div class="space-y-4 mb-8">
@@ -205,7 +205,7 @@
       <!-- Additional Info -->
       <div class="text-center mt-12">
         <p class="text-gray-600 mb-4">
-          All plans include a 14-day free trial. No credit card required.
+          All plans include a 30-day money back guarantee. Not satisfied? Get a full refund.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <div class="flex items-center text-sm text-gray-600">

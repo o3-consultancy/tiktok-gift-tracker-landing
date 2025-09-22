@@ -5,9 +5,10 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <div class="flex-shrink-0 flex items-center">
-              <img src="@/assets/o3-tt-gifts-logo.svg" alt="O3 TT Gifts" class="h-10 w-auto mr-3" />
-              <h1 class="text-2xl font-bold gradient-text">O3 TT Gifts</h1>
+            <div class="flex-shrink-0">
+              <router-link to="/" class="flex items-center">
+                <img src="@/assets/o3-tt-gifts-logo.svg" alt="O3 TT Gifts" class="h-10 w-auto" />
+              </router-link>
             </div>
           </div>
           <div class="hidden md:block">

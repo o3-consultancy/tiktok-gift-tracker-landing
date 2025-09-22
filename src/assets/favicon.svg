@@ -5,10 +5,10 @@
   <!-- O3 Text -->
   <text x="16" y="21" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="bold" fill="white">O3</text>
   
-  <!-- Small gift icon -->
-  <g transform="translate(22, 8)">
-    <rect x="0" y="2" width="6" height="4" fill="#f59e0b" rx="1"/>
-    <rect x="2" y="0" width="2" height="6" fill="#d97706"/>
+  <!-- Small gift icon inside O3 -->
+  <g transform="translate(12, 6)">
+    <rect x="0" y="1" width="3" height="2" fill="#f59e0b" rx="0.5"/>
+    <rect x="1" y="0" width="1" height="3" fill="#d97706"/>
   </g>
   
   <!-- Gradient -->

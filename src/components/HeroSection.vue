@@ -12,12 +12,22 @@
         </p>
         
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-slide-up">
-          <button class="btn-primary text-lg px-8 py-4 bg-white text-primary-600 hover:bg-gray-100">
-            Start Free Trial
-          </button>
+          <a href="#pricing" class="btn-primary text-lg px-8 py-4 bg-white text-primary-600 hover:bg-gray-100 inline-block text-center">
+            Get Started
+          </a>
           <button class="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-600">
-            Watch Demo
+            Request Demo
           </button>
+        </div>
+        
+        <!-- Money Back Guarantee -->
+        <div class="text-center mb-8 animate-slide-up">
+          <p class="text-lg text-gray-200">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 mr-2">
+              ✓ 30-Day Money Back Guarantee
+            </span>
+            Not satisfied? Get a full refund within 30 days.
+          </p>
         </div>
         
         <!-- Stats -->
