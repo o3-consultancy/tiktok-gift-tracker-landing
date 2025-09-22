@@ -30,9 +30,7 @@
           <ul class="space-y-2">
             <li><a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a></li>
             <li><a href="#pricing" class="text-gray-300 hover:text-white transition-colors">Pricing</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">API Documentation</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Integrations</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Changelog</a></li>
+            <!-- <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Changelog</a></li> -->
           </ul>
         </div>
         
@@ -42,9 +40,7 @@
           <ul class="space-y-2">
             <li><router-link to="/contact" class="text-gray-300 hover:text-white transition-colors">Help Center</router-link></li>
             <li><router-link to="/contact" class="text-gray-300 hover:text-white transition-colors">Contact Support</router-link></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">System Status</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Community</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Training</a></li>
+            <li><router-link to="/system-status" class="text-gray-300 hover:text-white transition-colors">System Status</router-link></li>
           </ul>
         </div>
       </div>

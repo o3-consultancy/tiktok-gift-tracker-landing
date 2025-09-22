@@ -13,8 +13,8 @@
           </div>
           <div class="hidden md:block">
             <div class="ml-10 flex items-baseline space-x-4">
-              <a href="#features" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Features</a>
-              <a href="#pricing" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Pricing</a>
+              <a href="#features" @click="scrollToSection('features')" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">Features</a>
+              <a href="#pricing" @click="scrollToSection('pricing')" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">Pricing</a>
               <router-link to="/contact" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</router-link>
             </div>
           </div>
@@ -31,8 +31,8 @@
       <!-- Mobile menu -->
       <div v-show="mobileMenuOpen" class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-          <a href="#features" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Features</a>
-          <a href="#pricing" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Pricing</a>
+          <a href="#features" @click="scrollToSection('features')" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium cursor-pointer">Features</a>
+          <a href="#pricing" @click="scrollToSection('pricing')" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium cursor-pointer">Pricing</a>
           <router-link to="/contact" class="text-gray-600 hover:text-primary-600 block px-3 py-2 rounded-md text-base font-medium">Contact</router-link>
         </div>
       </div>
@@ -64,4 +64,12 @@ import CTASection from '@/components/CTASection.vue'
 import FooterSection from '@/components/FooterSection.vue'
 
 const mobileMenuOpen = ref(false)
+
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' })
+  }
+  mobileMenuOpen.value = false // Close mobile menu after clicking
+}
 </script>

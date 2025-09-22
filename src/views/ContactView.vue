@@ -357,9 +357,9 @@ const submitForm = async () => {
     // Reset form
     Object.keys(form).forEach(key => {
       if (key === 'consent') {
-        form[key] = false
+        (form as any)[key] = false
       } else {
-        form[key] = ''
+        (form as any)[key] = ''
       }
     })
     

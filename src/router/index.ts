@@ -4,9 +4,14 @@ import ContactView from '../views/ContactView.vue'
 import PrivacyPolicy from '../views/PrivacyPolicy.vue'
 import TermsOfService from '../views/TermsOfService.vue'
 import CookiePolicy from '../views/CookiePolicy.vue'
+import SystemStatus from '../views/SystemStatus.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(_to, _from, _savedPosition) {
+    // Always scroll to top when navigating to a new route
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -32,6 +37,11 @@ const router = createRouter({
       path: '/cookie-policy',
       name: 'cookie-policy',
       component: CookiePolicy
+    },
+    {
+      path: '/system-status',
+      name: 'system-status',
+      component: SystemStatus
     }
   ]
 })

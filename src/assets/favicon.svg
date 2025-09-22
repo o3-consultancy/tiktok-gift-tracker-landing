@@ -1,21 +1,51 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background circle -->
+  <!-- Background circle with gradient -->
   <circle cx="16" cy="16" r="15" fill="url(#faviconGradient)" stroke="#1e40af" stroke-width="1"/>
   
   <!-- O3 Text -->
-  <text x="16" y="21" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="bold" fill="white">O3</text>
+  <text x="16" y="21" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="bold" fill="white">O3</text>
   
-  <!-- Small gift icon inside O3 -->
-  <g transform="translate(12, 6)">
+  <!-- TikTok musical note -->
+  <g transform="translate(8, 4)">
+    <!-- Note body -->
+    <circle cx="4" cy="4" r="2.5" fill="#ff0050"/>
+    <!-- Note stem -->
+    <rect x="3.5" y="6.5" width="1" height="4" fill="#ff0050"/>
+    <!-- Note flag -->
+    <path d="M4.5 6.5 C6 7.5 6 9.5 4.5 10.5" stroke="#ff0050" stroke-width="1" fill="none"/>
+  </g>
+  
+  <!-- Social media elements -->
+  <!-- Instagram camera -->
+  <g transform="translate(20, 6)">
+    <circle cx="3" cy="3" r="2.5" fill="none" stroke="#E4405F" stroke-width="0.8"/>
+    <circle cx="3" cy="3" r="1.5" fill="none" stroke="#E4405F" stroke-width="0.6"/>
+    <circle cx="3.8" cy="2.2" r="0.4" fill="#E4405F"/>
+  </g>
+  
+  <!-- YouTube play button -->
+  <g transform="translate(6, 20)">
+    <path d="M1 0.5 L3 1.5 L1 2.5 Z" fill="#FF0000"/>
+  </g>
+  
+  <!-- Twitter bird -->
+  <g transform="translate(20, 20)">
+    <path d="M1 2 C1.5 1.5 2 1 3 1 C3.5 1 4 1.5 4 2 C4 2.5 3.5 3 3 3 C2.5 3 2 2.5 1.5 2" stroke="#1DA1F2" stroke-width="0.8" fill="none"/>
+    <circle cx="2.5" cy="1.5" r="0.3" fill="#1DA1F2"/>
+  </g>
+  
+  <!-- Gift box -->
+  <g transform="translate(12, 12)">
     <rect x="0" y="1" width="3" height="2" fill="#f59e0b" rx="0.5"/>
     <rect x="1" y="0" width="1" height="3" fill="#d97706"/>
   </g>
   
-  <!-- Gradient -->
+  <!-- Gradients -->
   <defs>
     <linearGradient id="faviconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e3a8a;stop-opacity:1" />
     </linearGradient>
   </defs>
 </svg>
