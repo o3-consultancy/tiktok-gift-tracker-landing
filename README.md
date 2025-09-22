@@ -170,13 +170,13 @@ Modify `src/style.css` for global styles or individual component files for speci
 
 For technical support or questions about this landing page:
 
-- **Email**: hello@tiktokgifttracker.com
-- **Phone**: +1 (555) 123-4567
-- **Website**: www.tiktokgifttracker.com
+- **Email**: support@o3-ttgifts.com
+- **Phone**: +971 4 258 2613
+- **Website**: o3-ttgifts.com
 
 ## 📄 License
 
-© 2024 TikTok Gift Tracker Pro. All rights reserved.
+© 2025 O3 TT Gifts. All rights reserved.
 Powered by O3 Consultancy.
 
 ---

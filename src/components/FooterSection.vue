@@ -17,7 +17,7 @@
             <div class="flex items-center">
               <img src="@/assets/O3-logo.png" alt="O3 Consultancy" class="w-8 h-8 mr-3" />
               <div>
-                <h4 class="text-lg font-semibold text-white">O3 Consultancy</h4>
+                <a href="https://www.o3consultancy.ae" target="_blank" rel="noopener noreferrer" class="text-lg font-semibold text-white hover:text-primary-400 transition-colors">O3 Consultancy</a>
                 <p class="text-sm text-gray-400">Professional Software Solutions</p>
               </div>
             </div>
@@ -55,17 +55,17 @@
           <div>
             <h5 class="font-semibold mb-3">Contact Information</h5>
             <div class="space-y-2 text-gray-300">
-              <p>📧 hello@tiktokgifttracker.com</p>
-              <p>📞 +1 (555) 123-4567</p>
-              <p>🌐 www.tiktokgifttracker.com</p>
+              <p>📧 <a href="mailto:support@o3-ttgifts.com" class="hover:text-white transition-colors">support@o3-ttgifts.com</a></p>
+              <p>📞 <a href="tel:+97142582613" class="hover:text-white transition-colors">+971 4 258 2613</a></p>
+              <p>🌐 <a href="https://o3-ttgifts.com" class="hover:text-white transition-colors">o3-ttgifts.com</a></p>
             </div>
           </div>
           
           <div>
             <h5 class="font-semibold mb-3">Business Hours</h5>
             <div class="space-y-2 text-gray-300">
-              <p>Monday - Friday: 9:00 AM - 6:00 PM EST</p>
-              <p>Saturday: 10:00 AM - 4:00 PM EST</p>
+              <p>Monday - Friday: 9:00 AM - 5:00 PM GMT +4</p>
+              <p>Saturday: 9:00 AM - 12:00 PM GMT +4</p>
               <p>Sunday: Closed</p>
             </div>
           </div>
@@ -84,13 +84,13 @@
       <!-- Bottom Bar -->
       <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
         <div class="text-gray-400 text-sm mb-4 md:mb-0">
-          © 2024 O3 TT Gifts. All rights reserved. | Powered by O3 Consultancy
+          © 2025 O3 TT Gifts. All rights reserved. | Powered by <a href="https://www.o3consultancy.ae" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">O3 Consultancy</a>
         </div>
         
         <div class="flex space-x-6">
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
-          <a href="#" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</a>
+          <router-link to="/privacy-policy" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</router-link>
+          <router-link to="/terms-of-service" class="text-gray-400 hover:text-white transition-colors">Terms of Service</router-link>
+          <router-link to="/cookie-policy" class="text-gray-400 hover:text-white transition-colors">Cookie Policy</router-link>
         </div>
       </div>
     </div>
