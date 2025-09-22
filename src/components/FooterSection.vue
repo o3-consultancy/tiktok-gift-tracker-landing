@@ -40,8 +40,8 @@
         <div>
           <h4 class="text-lg font-semibold mb-4">Support</h4>
           <ul class="space-y-2">
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Help Center</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Contact Support</a></li>
+            <li><router-link to="/contact" class="text-gray-300 hover:text-white transition-colors">Help Center</router-link></li>
+            <li><router-link to="/contact" class="text-gray-300 hover:text-white transition-colors">Contact Support</router-link></li>
             <li><a href="#" class="text-gray-300 hover:text-white transition-colors">System Status</a></li>
             <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Community</a></li>
             <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Training</a></li>

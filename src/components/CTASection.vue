@@ -13,9 +13,9 @@
         <a href="#pricing" class="btn-primary text-lg px-8 py-4 bg-white text-primary-600 hover:bg-gray-100 inline-block text-center">
           Get Started
         </a>
-        <button class="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-600">
+        <router-link to="/contact" class="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-600 inline-block text-center">
           Schedule a Demo
-        </button>
+        </router-link>
       </div>
       
       <!-- Trust Indicators -->
