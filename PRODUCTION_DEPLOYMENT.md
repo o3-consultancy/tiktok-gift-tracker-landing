@@ -116,7 +116,13 @@ git clone https://github.com/o3-consultancy/tiktok-gift-tracker-landing.git .
 ### 4.1 Install Backend Dependencies
 ```bash
 cd backend
-npm install --production
+
+# Install ALL dependencies (including devDependencies like tsx)
+# We need tsx to run TypeScript directly in production
+npm install
+
+# Note: We use npm install (not --production) because we need tsx
+# which is in devDependencies. Alternative would be to build with tsc.
 ```
 
 ### 4.2 Create Production Environment File
@@ -184,11 +190,14 @@ cat src/env.ts
 
 ### 4.5 Test Backend
 ```bash
-# Build TypeScript (if needed)
-npm run build
-
-# Test run
+# Test run (tsx will compile TypeScript on-the-fly)
 npm run dev
+
+# You should see logs like:
+# 🚀 Server running on http://0.0.0.0:3001
+# 📝 Environment: production
+# 🔗 Frontend URL: https://o3-ttgifts.com
+
 # Press Ctrl+C to stop after confirming it works
 ```
 
@@ -382,18 +391,16 @@ sudo systemctl status certbot.timer
 ```bash
 cd /var/www/o3-ttgifts/tiktok-gift-tracker-landing/backend
 
-# Start with PM2
-pm2 start src/server.ts --name o3-backend --interpreter tsx
-
-# Or if you have a start script:
-pm2 start npm --name o3-backend -- run dev
+# Start with PM2 using tsx interpreter
+pm2 start src/server.ts --name o3-backend --interpreter ./node_modules/.bin/tsx
 
 # Save PM2 configuration
 pm2 save
 
 # Set PM2 to start on boot (if not done earlier)
 pm2 startup
-# Run the command it outputs
+# Run the command it outputs (it will show something like):
+# sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u your-username --hp /home/your-username
 ```
 
 ### 8.2 Monitor Backend
