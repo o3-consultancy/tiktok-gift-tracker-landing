@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
-export type AccountStatus = 'active' | 'inactive' | 'suspended';
+export type AccountStatus = 'pending' | 'active' | 'inactive' | 'suspended';
 
 export interface ITikTokAccount extends Document {
   userId: Types.ObjectId;
@@ -8,6 +8,7 @@ export interface ITikTokAccount extends Document {
   accountHandle?: string;
   accountId?: string;
   status: AccountStatus;
+  accessUrl?: string;  // Added for admin to assign live URLs
   giftGroupsCount: number;
   lastSyncedAt?: Date;
   metadata?: Record<string, any>;
@@ -40,8 +41,12 @@ const tiktokAccountSchema = new Schema<ITikTokAccount>(
     },
     status: {
       type: String,
-      enum: ['active', 'inactive', 'suspended'],
-      default: 'active'
+      enum: ['pending', 'active', 'inactive', 'suspended'],
+      default: 'pending'  // Changed to pending for new accounts
+    },
+    accessUrl: {
+      type: String,
+      default: ''  // Admin will assign this
     },
     giftGroupsCount: {
       type: Number,

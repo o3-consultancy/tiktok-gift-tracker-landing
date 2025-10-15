@@ -6,6 +6,7 @@ export interface IUser extends Document {
   displayName?: string;
   photoURL?: string;
   emailVerified: boolean;
+  role: 'user' | 'admin';  // Added for admin panel
   createdAt: Date;
   updatedAt: Date;
   lastLogin?: Date;
@@ -38,6 +39,11 @@ const userSchema = new Schema<IUser>(
     emailVerified: {
       type: Boolean,
       default: false
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user'  // All existing users remain 'user'
     },
     lastLogin: {
       type: Date
