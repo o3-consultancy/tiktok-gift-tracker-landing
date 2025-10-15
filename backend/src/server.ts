@@ -27,9 +27,32 @@ initializeFirebase();
 
 // Middleware
 app.use(helmet()); // Security headers
+
+// CORS configuration - allow multiple origins
+const allowedOrigins = [
+  'https://o3-ttgifts.com',
+  'https://www.o3-ttgifts.com',
+  'https://admin.o3-ttgifts.com',
+  'http://localhost:5173',  // Local frontend dev
+  'http://localhost:5174',  // Local admin dev
+  'http://localhost:3000'   // Alternative local port
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      logger.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Raw body for Stripe webhooks
