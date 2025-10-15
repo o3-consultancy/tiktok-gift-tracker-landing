@@ -20,7 +20,7 @@
               <span class="text-4xl font-bold text-gray-900">$30</span>
               <span class="text-gray-600">/month</span>
             </div>
-            <button class="btn-outline w-full">Subscribe</button>
+            <button @click="selectPlan('STARTER')" class="btn-outline w-full">Subscribe</button>
           </div>
           
           <div class="space-y-4 mb-8">
@@ -76,7 +76,7 @@
               <span class="text-4xl font-bold text-gray-900">$80</span>
               <span class="text-gray-600">/month</span>
             </div>
-            <button class="btn-primary w-full">Subscribe</button>
+            <button @click="selectPlan('PROFESSIONAL')" class="btn-primary w-full">Subscribe</button>
           </div>
           
           <div class="space-y-4 mb-8">
@@ -140,7 +140,7 @@
               <span class="text-4xl font-bold text-gray-900">$230</span>
               <span class="text-gray-600">/month</span>
             </div>
-            <button class="btn-outline w-full">Contact Sales</button>
+            <button @click="selectPlan('ENTERPRISE')" class="btn-outline w-full">Subscribe</button>
           </div>
           
           <div class="space-y-4 mb-8">
@@ -233,5 +233,30 @@
 </template>
 
 <script setup lang="ts">
-// Pricing section component
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+const selectPlan = (plan: string) => {
+  // Check if user is authenticated
+  if (!authStore.isAuthenticated) {
+    // Redirect to signup with plan as query param
+    // Signup will redirect to checkout with the plan
+    router.push({
+      path: '/signup',
+      query: {
+        plan: plan,
+        redirect: '/checkout'
+      }
+    });
+  } else {
+    // User is authenticated, go directly to checkout with plan
+    router.push({
+      path: '/checkout',
+      query: { plan: plan }
+    });
+  }
+};
 </script>

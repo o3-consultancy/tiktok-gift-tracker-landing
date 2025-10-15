@@ -5,6 +5,13 @@ import PrivacyPolicy from '../views/PrivacyPolicy.vue'
 import TermsOfService from '../views/TermsOfService.vue'
 import CookiePolicy from '../views/CookiePolicy.vue'
 import SystemStatus from '../views/SystemStatus.vue'
+import LoginView from '../views/LoginView.vue'
+import SignupView from '../views/SignupView.vue'
+import CheckoutView from '../views/CheckoutView.vue'
+import CheckoutSuccess from '../views/CheckoutSuccess.vue'
+import CheckoutCancel from '../views/CheckoutCancel.vue'
+import DashboardView from '../views/DashboardView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +29,41 @@ const router = createRouter({
       path: '/contact',
       name: 'contact',
       component: ContactView
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupView
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: CheckoutView
+    },
+    {
+      path: '/checkout/success',
+      name: 'checkout-success',
+      component: CheckoutSuccess
+    },
+    {
+      path: '/checkout/cancel',
+      name: 'checkout-cancel',
+      component: CheckoutCancel
+    },
+    {
+      path: '/app/dashboard',
+      name: 'dashboard',
+      component: DashboardView
+    },
+    {
+      path: '/app/settings',
+      name: 'settings',
+      component: SettingsView
     },
     {
       path: '/privacy-policy',
