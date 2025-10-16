@@ -175,6 +175,67 @@ export const adminApiService = {
         success: boolean;
         data: AnalyticsData;
       }>('/admin/analytics')
+  },
+
+  /**
+   * Coupon management endpoints
+   */
+  coupons: {
+    getAll: () =>
+      api.get<{
+        success: boolean;
+        data: {
+          coupons: any[];
+        };
+      }>('/coupons'),
+
+    getOne: (couponId: string) =>
+      api.get<{
+        success: boolean;
+        data: any;
+      }>(`/coupons/${couponId}`),
+
+    create: (data: {
+      code: string;
+      description?: string;
+      usageLimit: number;
+      expiresAt?: string;
+      isActive: boolean;
+    }) =>
+      api.post<{
+        success: boolean;
+        data: any;
+        message: string;
+      }>('/coupons', data),
+
+    update: (couponId: string, data: {
+      description?: string;
+      usageLimit?: number;
+      expiresAt?: string;
+      isActive?: boolean;
+    }) =>
+      api.patch<{
+        success: boolean;
+        data: any;
+        message: string;
+      }>(`/coupons/${couponId}`, data),
+
+    delete: (couponId: string) =>
+      api.delete<{
+        success: boolean;
+        message: string;
+      }>(`/coupons/${couponId}`),
+
+    getStats: () =>
+      api.get<{
+        success: boolean;
+        data: {
+          totalCoupons: number;
+          activeCoupons: number;
+          totalRedemptions: number;
+          totalFeesWaived: number;
+        };
+      }>('/coupons/stats/summary')
   }
 };
 

@@ -5,6 +5,7 @@ import DashboardView from '../views/DashboardView.vue';
 import UsersView from '../views/UsersView.vue';
 import AccountsView from '../views/AccountsView.vue';
 import AnalyticsView from '../views/AnalyticsView.vue';
+import CouponsView from '../views/CouponsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +38,12 @@ const router = createRouter({
       path: '/analytics',
       name: 'analytics',
       component: AnalyticsView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/coupons',
+      name: 'coupons',
+      component: CouponsView,
       meta: { requiresAuth: true }
     }
   ]
