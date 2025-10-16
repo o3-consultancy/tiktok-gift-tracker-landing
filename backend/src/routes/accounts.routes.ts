@@ -238,4 +238,94 @@ router.post(
   })
 );
 
+/**
+ * GET /api/accounts/:id/instance-credentials
+ * Get tracker instance credentials (API Key & URL) for a specific account
+ */
+router.get(
+  '/:id/instance-credentials',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response) => {
+    const { TrackerInstance } = await import('../models/TrackerInstance.js');
+
+    const user = await User.findOne({ firebaseUid: req.user!.uid });
+    if (!user) {
+      throw createError('User not found', 404);
+    }
+
+    const account = await TikTokAccount.findOne({
+      _id: req.params.id,
+      userId: user._id
+    });
+
+    if (!account) {
+      throw createError('Account not found', 404);
+    }
+
+    // Find tracker instance for this account
+    const instance = await TrackerInstance.findOne({
+      accountId: account._id,
+      status: 'active'
+    });
+
+    if (!instance) {
+      // No instance credentials generated yet
+      return res.json({
+        success: true,
+        data: {
+          hasCredentials: false,
+          message: 'Instance credentials not yet generated. Contact support to set up your tracker instance.'
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        hasCredentials: true,
+        accountId: account._id.toString(),
+        apiKey: instance.apiKey,
+        instanceUrl: instance.instanceUrl || null,
+        lastAccessedAt: instance.lastAccessedAt
+      }
+    });
+  })
+);
+
+/**
+ * POST /api/accounts/:id/request-disconnection
+ * Request disconnection of a deployed account
+ */
+router.post(
+  '/:id/request-disconnection',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response) => {
+    const user = await User.findOne({ firebaseUid: req.user!.uid });
+    if (!user) {
+      throw createError('User not found', 404);
+    }
+
+    const account = await TikTokAccount.findOne({
+      _id: req.params.id,
+      userId: user._id
+    });
+
+    if (!account) {
+      throw createError('Account not found', 404);
+    }
+
+    // Mark account for disconnection
+    account.disconnectionRequested = true;
+    account.disconnectionRequestedAt = new Date();
+    await account.save();
+
+    logger.info(`Disconnection requested for account ${account.accountName} by user ${user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Disconnection request submitted. An administrator will process your request shortly.'
+    });
+  })
+);
+
 export default router;

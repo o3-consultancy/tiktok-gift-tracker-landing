@@ -11,6 +11,8 @@ export interface ITikTokAccount extends Document {
   accessUrl?: string;  // Added for admin to assign live URLs
   giftGroupsCount: number;
   lastSyncedAt?: Date;
+  disconnectionRequested?: boolean;  // Customer requested disconnection
+  disconnectionRequestedAt?: Date;  // When disconnection was requested
   metadata?: Record<string, any>;
   createdAt: Date;
   updatedAt: Date;
@@ -54,6 +56,13 @@ const tiktokAccountSchema = new Schema<ITikTokAccount>(
       min: 0
     },
     lastSyncedAt: {
+      type: Date
+    },
+    disconnectionRequested: {
+      type: Boolean,
+      default: false
+    },
+    disconnectionRequestedAt: {
       type: Date
     },
     metadata: {
