@@ -417,11 +417,17 @@ const showViewModal = ref(false);
 const selectedCoupon = ref<Coupon | null>(null);
 const saving = ref(false);
 
-const formData = ref({
+const formData = ref<{
+  code: string;
+  description: string;
+  usageLimit: number;
+  expiresAt: string | undefined;
+  isActive: boolean;
+}>({
   code: '',
   description: '',
   usageLimit: 10,
-  expiresAt: '',
+  expiresAt: undefined,
   isActive: true
 });
 
@@ -493,7 +499,7 @@ const editCoupon = (coupon: Coupon) => {
     code: coupon.code,
     description: coupon.description || '',
     usageLimit: coupon.usageLimit,
-    expiresAt: coupon.expiresAt ? coupon.expiresAt.split('T')[0] : '',
+    expiresAt: coupon.expiresAt ? coupon.expiresAt.split('T')[0] : undefined,
     isActive: coupon.isActive
   };
   showEditModal.value = true;
@@ -523,7 +529,7 @@ const closeModals = () => {
     code: '',
     description: '',
     usageLimit: 10,
-    expiresAt: '',
+    expiresAt: undefined,
     isActive: true
   };
 };
