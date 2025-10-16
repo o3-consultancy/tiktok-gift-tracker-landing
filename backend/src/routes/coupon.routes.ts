@@ -109,7 +109,7 @@ router.get(
 
     // Format response with computed fields
     const formattedCoupons = coupons.map(coupon => ({
-      id: coupon._id,
+      _id: coupon._id,
       code: coupon.code,
       description: coupon.description,
       discountType: coupon.discountType,
@@ -258,7 +258,7 @@ router.get(
     res.json({
       success: true,
       data: {
-        id: coupon._id,
+        _id: coupon._id,
         code: coupon.code,
         description: coupon.description,
         discountType: coupon.discountType,
