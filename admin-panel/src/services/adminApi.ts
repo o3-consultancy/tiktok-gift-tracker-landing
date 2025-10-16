@@ -71,8 +71,14 @@ export interface UserWithSubscription {
 }
 
 export interface TikTokAccountWithUser {
-  _id: string;
-  userId: {
+  id: string;
+  _id?: string; // Keep for backwards compatibility
+  user: {
+    id: string;
+    email: string;
+    displayName?: string;
+  } | null;
+  userId?: { // Keep for backwards compatibility
     _id: string;
     email: string;
     displayName?: string;
@@ -82,6 +88,8 @@ export interface TikTokAccountWithUser {
   accountHandle?: string;
   status: 'pending' | 'active' | 'inactive';
   accessUrl?: string;
+  disconnectionRequested?: boolean;
+  disconnectionRequestedAt?: string;
   createdAt: string;
 }
 
@@ -163,7 +171,13 @@ export const adminApiService = {
         success: boolean;
         data: TikTokAccountWithUser;
         message: string;
-      }>(`/admin/accounts/${accountId}`, data)
+      }>(`/admin/accounts/${accountId}`, data),
+
+    disconnect: (accountId: string) =>
+      api.post<{
+        success: boolean;
+        message: string;
+      }>(`/admin/accounts/${accountId}/disconnect`)
   },
 
   /**
@@ -236,6 +250,53 @@ export const adminApiService = {
           totalFeesWaived: number;
         };
       }>('/coupons/stats/summary')
+  },
+
+  /**
+   * Tracker Instance management endpoints
+   */
+  instances: {
+    get: (accountId: string) =>
+      api.get<{
+        success: boolean;
+        data: {
+          hasInstance: boolean;
+          accountId?: string;
+          apiKey?: string;
+          instanceUrl?: string;
+          status?: string;
+          lastAccessedAt?: string;
+        };
+      }>(`/admin/instances/${accountId}`),
+
+    generateKey: (accountId: string) =>
+      api.post<{
+        success: boolean;
+        data: {
+          accountId: string;
+          apiKey: string;
+          instanceUrl?: string;
+          status: string;
+        };
+        message: string;
+      }>('/admin/instances/generate-key', { accountId }),
+
+    regenerateKey: (accountId: string) =>
+      api.post<{
+        success: boolean;
+        data: {
+          accountId: string;
+          apiKey: string;
+        };
+        message: string;
+      }>('/admin/instances/regenerate-key', { accountId }),
+
+    updateUrl: (accountId: string, instanceUrl: string) =>
+      api.patch<{
+        success: boolean;
+        data: any;
+        message: string;
+      }>(`/admin/instances/${accountId}/url`, { instanceUrl })
   }
 };
 

@@ -246,7 +246,10 @@ router.get(
 
     // Build query
     const query: any = {};
-    if (status) {
+    if (status === 'disconnection') {
+      // Filter for accounts with disconnection requests
+      query.disconnectionRequested = true;
+    } else if (status) {
       query.status = status;
     }
     if (search) {
@@ -280,6 +283,8 @@ router.get(
           accountHandle: account.accountHandle,
           status: account.status,
           accessUrl: account.accessUrl || '',
+          disconnectionRequested: account.disconnectionRequested || false,
+          disconnectionRequestedAt: account.disconnectionRequestedAt,
           createdAt: account.createdAt,
           updatedAt: account.updatedAt,
           user: account.userId ? {
@@ -357,6 +362,38 @@ router.patch(
       success: true,
       data: updatedAccount,
       message: 'Account updated successfully'
+    });
+  })
+);
+
+/**
+ * POST /api/admin/accounts/:accountId/disconnect
+ * Disconnect tracker instance and delete account
+ */
+router.post(
+  '/accounts/:accountId/disconnect',
+  asyncHandler(async (req: Request, res: Response) => {
+    const account = await TikTokAccount.findById(req.params.accountId);
+    if (!account) {
+      throw createError('Account not found', 404);
+    }
+
+    // Import TrackerInstance model
+    const { TrackerInstance } = await import('../models/TrackerInstance.js');
+    const { InstanceData } = await import('../models/InstanceData.js');
+
+    // Delete tracker instance and all related data
+    await TrackerInstance.deleteOne({ accountId: account._id });
+    await InstanceData.deleteMany({ accountId: account._id });
+
+    // Delete the account
+    await account.deleteOne();
+
+    logger.info(`Admin disconnected and deleted account ${account.accountId}`);
+
+    res.json({
+      success: true,
+      message: 'Account disconnected and deleted successfully'
     });
   })
 );
@@ -529,6 +566,183 @@ router.get(
           amount: p.amount / 100
         })),
         recentAccounts
+      }
+    });
+  })
+);
+
+/**
+ * GET /api/admin/instances/:accountId
+ * Get tracker instance data for an account
+ */
+router.get(
+  '/instances/:accountId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { accountId } = req.params;
+
+    // Import TrackerInstance model
+    const { TrackerInstance } = await import('../models/TrackerInstance.js');
+
+    // Find instance
+    const instance = await TrackerInstance.findOne({ accountId });
+
+    if (!instance) {
+      return res.json({
+        success: true,
+        data: {
+          hasInstance: false
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        hasInstance: true,
+        accountId: instance.accountId,
+        apiKey: instance.apiKey,
+        instanceUrl: instance.instanceUrl,
+        status: instance.status,
+        lastAccessedAt: instance.lastAccessedAt
+      }
+    });
+  })
+);
+
+/**
+ * POST /api/admin/instances/generate-key
+ * Generate API key for an account
+ */
+router.post(
+  '/instances/generate-key',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { accountId } = req.body;
+
+    if (!accountId) {
+      throw createError('Account ID is required', 400);
+    }
+
+    // Import TrackerInstance model
+    const { TrackerInstance } = await import('../models/TrackerInstance.js');
+    const { TikTokAccount } = await import('../models/TikTokAccount.js');
+
+    // Verify account exists
+    const account = await TikTokAccount.findById(accountId);
+    if (!account) {
+      throw createError('Account not found', 404);
+    }
+
+    // Check if instance already exists
+    const existingInstance = await TrackerInstance.findOne({ accountId });
+    if (existingInstance) {
+      throw createError('API key already exists for this account. Use regenerate endpoint.', 400);
+    }
+
+    // Generate API key
+    const apiKey = (TrackerInstance as any).generateApiKey();
+
+    // Create tracker instance
+    const instance = await TrackerInstance.create({
+      accountId: account._id,
+      userId: account.userId,
+      apiKey,
+      status: 'active'
+    });
+
+    logger.info(`API key generated for account ${accountId}`);
+
+    res.json({
+      success: true,
+      message: 'API key generated successfully',
+      data: {
+        accountId: instance.accountId,
+        apiKey: instance.apiKey,
+        instanceUrl: instance.instanceUrl,
+        status: instance.status
+      }
+    });
+  })
+);
+
+/**
+ * POST /api/admin/instances/regenerate-key
+ * Regenerate API key for an account
+ */
+router.post(
+  '/instances/regenerate-key',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { accountId } = req.body;
+
+    if (!accountId) {
+      throw createError('Account ID is required', 400);
+    }
+
+    // Import TrackerInstance model
+    const { TrackerInstance } = await import('../models/TrackerInstance.js');
+
+    // Find existing instance
+    const instance = await TrackerInstance.findOne({ accountId });
+    if (!instance) {
+      throw createError('No API key found for this account. Use generate endpoint.', 404);
+    }
+
+    // Generate new API key
+    const newApiKey = (TrackerInstance as any).generateApiKey();
+
+    // Update instance
+    instance.apiKey = newApiKey;
+    await instance.save();
+
+    logger.info(`API key regenerated for account ${accountId}`);
+
+    res.json({
+      success: true,
+      message: 'API key regenerated successfully',
+      data: {
+        accountId: instance.accountId,
+        apiKey: instance.apiKey,
+        instanceUrl: instance.instanceUrl,
+        status: instance.status
+      }
+    });
+  })
+);
+
+/**
+ * PATCH /api/admin/instances/:accountId/url
+ * Update instance URL for an account
+ */
+router.patch(
+  '/instances/:accountId/url',
+  asyncHandler(async (req: Request, res: Response) => {
+    const { accountId } = req.params;
+    const { instanceUrl } = req.body;
+
+    if (!instanceUrl) {
+      throw createError('Instance URL is required', 400);
+    }
+
+    // Import TrackerInstance model
+    const { TrackerInstance } = await import('../models/TrackerInstance.js');
+
+    // Find instance
+    const instance = await TrackerInstance.findOne({ accountId });
+    if (!instance) {
+      throw createError('No instance found for this account', 404);
+    }
+
+    // Update URL
+    instance.instanceUrl = instanceUrl;
+    await instance.save();
+
+    logger.info(`Instance URL updated for account ${accountId}`);
+
+    res.json({
+      success: true,
+      message: 'Instance URL updated successfully',
+      data: {
+        accountId: instance.accountId,
+        instanceUrl: instance.instanceUrl
       }
     });
   })
