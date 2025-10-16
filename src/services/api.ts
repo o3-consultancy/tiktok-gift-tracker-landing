@@ -47,10 +47,16 @@ export const apiService = {
 
   // Payment endpoints
   payments: {
-    createCheckoutSession: (data: { plan: string; accountCount?: number }) =>
+    createCheckoutSession: (data: { plan: string; accountCount?: number; couponCode?: string }) =>
       api.post('/payments/create-checkout-session', data),
     getHistory: () => api.get('/payments/history'),
     getInvoices: () => api.get('/payments/invoices')
+  },
+
+  // Coupon endpoints
+  coupons: {
+    validate: (code: string) =>
+      api.post('/coupons/validate', { code })
   },
 
   // Subscription endpoints

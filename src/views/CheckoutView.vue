@@ -75,6 +75,51 @@
             </div>
           </div>
 
+          <!-- Coupon Code -->
+          <div class="border-b border-gray-200 pb-6 mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Have a Coupon Code?</h3>
+            <div class="flex gap-2">
+              <input
+                v-model="couponCode"
+                type="text"
+                placeholder="Enter coupon code"
+                :disabled="couponValidated || validatingCoupon"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed uppercase"
+                @input="couponCode = couponCode.toUpperCase()"
+              />
+              <button
+                v-if="!couponValidated"
+                @click="validateCoupon"
+                :disabled="!couponCode || validatingCoupon"
+                class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ validatingCoupon ? 'Validating...' : 'Apply' }}
+              </button>
+              <button
+                v-else
+                @click="removeCoupon"
+                class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Remove
+              </button>
+            </div>
+
+            <!-- Coupon Success Message -->
+            <div v-if="couponValidated" class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div class="flex items-center text-sm text-green-800">
+                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">Coupon applied! Your $500 deployment fee has been waived.</span>
+              </div>
+            </div>
+
+            <!-- Coupon Error Message -->
+            <div v-if="couponError" class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-sm text-red-800">{{ couponError }}</p>
+            </div>
+          </div>
+
           <!-- One-time Deployment Fee -->
           <div class="border-b border-gray-200 pb-6 mb-6">
             <div class="flex justify-between items-center">
@@ -82,15 +127,26 @@
                 <h3 class="text-lg font-semibold text-gray-900">One-Time Setup Fee</h3>
                 <p class="text-sm text-gray-600 mt-1">Deployment and configuration</p>
               </div>
-              <p class="text-lg font-bold text-gray-900">$500.00</p>
+              <p :class="['text-lg font-bold', couponValidated ? 'text-green-600 line-through' : 'text-gray-900']">
+                $500.00
+              </p>
             </div>
+            <p v-if="couponValidated" class="text-right text-sm text-green-600 font-medium mt-1">
+              Waived by coupon
+            </p>
           </div>
 
           <!-- Total Today -->
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
             <div class="flex justify-between items-center mb-2">
               <span class="text-gray-700">Setup Fee</span>
-              <span class="text-gray-900 font-medium">$500.00</span>
+              <span :class="['font-medium', couponValidated ? 'text-green-600 line-through' : 'text-gray-900']">
+                $500.00
+              </span>
+            </div>
+            <div v-if="couponValidated" class="flex justify-between items-center mb-2">
+              <span class="text-green-600">Coupon Discount</span>
+              <span class="text-green-600 font-medium">-$500.00</span>
             </div>
             <div class="flex justify-between items-center mb-2">
               <span class="text-gray-700">First Month</span>
@@ -186,6 +242,12 @@ const processingPayment = ref(false);
 const errorMessage = ref('');
 const selectedPlan = ref<any>(null);
 
+// Coupon state
+const couponCode = ref('');
+const couponValidated = ref(false);
+const validatingCoupon = ref(false);
+const couponError = ref('');
+
 const PLANS = {
   STARTER: {
     name: 'Starter',
@@ -212,8 +274,40 @@ const PLANS = {
 
 const totalDueToday = computed(() => {
   if (!selectedPlan.value) return 0;
-  return 500 + (selectedPlan.value.monthlyPrice / 100);
+  const setupFee = couponValidated.value ? 0 : 500;
+  return setupFee + (selectedPlan.value.monthlyPrice / 100);
 });
+
+// Validate coupon
+const validateCoupon = async () => {
+  if (!couponCode.value.trim()) return;
+
+  try {
+    validatingCoupon.value = true;
+    couponError.value = '';
+
+    const response = await apiService.coupons.validate(couponCode.value.trim().toUpperCase());
+
+    if (response.data.success && response.data.data.valid) {
+      couponValidated.value = true;
+      couponError.value = '';
+    } else {
+      couponError.value = 'Invalid coupon code';
+    }
+  } catch (error: any) {
+    couponError.value = error.response?.data?.message || 'Invalid coupon code';
+    couponValidated.value = false;
+  } finally {
+    validatingCoupon.value = false;
+  }
+};
+
+// Remove coupon
+const removeCoupon = () => {
+  couponCode.value = '';
+  couponValidated.value = false;
+  couponError.value = '';
+};
 
 onMounted(async () => {
   // Check if user is authenticated
@@ -247,7 +341,8 @@ const proceedToStripe = async () => {
     // Create checkout session
     const response = await apiService.payments.createCheckoutSession({
       plan: planParam,
-      accountCount: selectedPlan.value.accounts
+      accountCount: selectedPlan.value.accounts,
+      couponCode: couponValidated.value ? couponCode.value.trim().toUpperCase() : undefined
     });
 
     // Redirect to Stripe Checkout
