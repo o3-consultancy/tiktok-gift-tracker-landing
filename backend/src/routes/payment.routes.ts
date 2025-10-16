@@ -7,6 +7,7 @@ import { stripe, PRICING_PLANS, DEPLOYMENT_FEE, isPlanType, PlanType } from '../
 import { User } from '../models/User.js';
 import { Subscription } from '../models/Subscription.js';
 import { Payment } from '../models/Payment.js';
+import { Coupon } from '../models/Coupon.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
@@ -20,7 +21,7 @@ router.post(
   authenticate,
   paymentLimiter,
   asyncHandler(async (req: Request, res: Response) => {
-    const { plan, accountCount } = req.body;
+    const { plan, accountCount, couponCode } = req.body;
 
     // Validate plan
     if (!plan || !isPlanType(plan)) {
@@ -43,6 +44,40 @@ router.post(
 
     if (existingSubscription) {
       throw createError('You already have an active subscription', 400);
+    }
+
+    // Validate coupon if provided
+    let validatedCoupon: any = null;
+    let waiveDeploymentFee = false;
+
+    if (couponCode) {
+      const coupon = await Coupon.findOne({
+        code: couponCode.trim().toUpperCase()
+      });
+
+      if (!coupon) {
+        throw createError('Invalid coupon code', 400);
+      }
+
+      if (!coupon.isActive) {
+        throw createError('This coupon is no longer active', 400);
+      }
+
+      if (coupon.expiresAt && new Date() > coupon.expiresAt) {
+        throw createError('This coupon has expired', 400);
+      }
+
+      if (coupon.usageCount >= coupon.usageLimit) {
+        throw createError('This coupon has reached its usage limit', 400);
+      }
+
+      if (coupon.hasBeenUsedBy(user._id.toString())) {
+        throw createError('You have already used this coupon', 400);
+      }
+
+      validatedCoupon = coupon;
+      waiveDeploymentFee = true;
+      logger.info(`Valid coupon applied: ${couponCode} for user ${user.email}`);
     }
 
     // Create or get Stripe customer
@@ -70,45 +105,53 @@ router.post(
 
     const totalMonthlyPrice = selectedPlan.monthlyPrice + additionalAccountCost;
 
+    // Build line items - conditionally include deployment fee
+    const lineItems: any[] = [];
+
+    // Add one-time deployment fee if not waived by coupon
+    if (!waiveDeploymentFee) {
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'One-Time Deployment Fee',
+            description: 'Setup and deployment of your O3 TT Gifts instance'
+          },
+          unit_amount: DEPLOYMENT_FEE
+        },
+        quantity: 1
+      });
+    }
+
+    // Add monthly subscription
+    lineItems.push({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: `${selectedPlan.name} Plan`,
+          description: `${baseAccountCount + additionalAccounts} TikTok accounts, ${selectedPlan.giftGroups} gift groups`
+        },
+        unit_amount: totalMonthlyPrice,
+        recurring: {
+          interval: 'month'
+        }
+      },
+      quantity: 1
+    });
+
     // Create checkout session with deployment fee + subscription
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [
-        // One-time deployment fee
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'One-Time Deployment Fee',
-              description: 'Setup and deployment of your O3 TT Gifts instance'
-            },
-            unit_amount: DEPLOYMENT_FEE
-          },
-          quantity: 1
-        },
-        // Monthly subscription
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `${selectedPlan.name} Plan`,
-              description: `${baseAccountCount + additionalAccounts} TikTok accounts, ${selectedPlan.giftGroups} gift groups`
-            },
-            unit_amount: totalMonthlyPrice,
-            recurring: {
-              interval: 'month'
-            }
-          },
-          quantity: 1
-        }
-      ],
+      line_items: lineItems,
       subscription_data: {
         metadata: {
           userId: user._id.toString(),
           plan: plan,
-          accountCount: (baseAccountCount + additionalAccounts).toString()
+          accountCount: (baseAccountCount + additionalAccounts).toString(),
+          couponId: validatedCoupon?._id.toString() || '',
+          couponCode: validatedCoupon?.code || ''
         }
       },
       success_url: `${process.env.FRONTEND_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -116,7 +159,9 @@ router.post(
       metadata: {
         userId: user._id.toString(),
         plan: plan,
-        deploymentFee: 'true'
+        deploymentFee: waiveDeploymentFee ? 'false' : 'true',
+        couponId: validatedCoupon?._id.toString() || '',
+        couponCode: validatedCoupon?.code || ''
       }
     });
 
@@ -322,25 +367,45 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
   subscription.stripeSubscriptionId = session.subscription as string;
   subscription.status = 'active';
-  subscription.deploymentFeePaid = true;
+  subscription.deploymentFeePaid = session.metadata?.deploymentFee !== 'false';
   await subscription.save();
 
   logger.info(`✅ Subscription activated for user ${userId}`);
   logger.info(`Updated subscription status to: ${subscription.status}`);
 
-  // Record deployment fee payment
-  const payment = await Payment.create({
-    userId: userId,
-    subscriptionId: subscription._id,
-    stripePaymentIntentId: session.payment_intent as string,
-    type: 'deployment_fee',
-    amount: DEPLOYMENT_FEE,
-    currency: 'usd',
-    status: 'succeeded',
-    description: 'One-time deployment fee'
-  });
+  // Record coupon usage if a coupon was used
+  const couponId = session.metadata?.couponId;
+  const couponCode = session.metadata?.couponCode;
 
-  logger.info(`✅ Payment record created: ${payment._id}`);
+  if (couponId && couponCode) {
+    try {
+      const coupon = await Coupon.findById(couponId);
+      if (coupon) {
+        await coupon.recordUsage(userId, subscription._id);
+        logger.info(`✅ Coupon usage recorded: ${couponCode} for user ${userId}`);
+      }
+    } catch (err: any) {
+      logger.error(`❌ Failed to record coupon usage: ${err.message}`);
+    }
+  }
+
+  // Record deployment fee payment only if it was actually charged
+  if (session.metadata?.deploymentFee !== 'false') {
+    const payment = await Payment.create({
+      userId: userId,
+      subscriptionId: subscription._id,
+      stripePaymentIntentId: session.payment_intent as string,
+      type: 'deployment_fee',
+      amount: DEPLOYMENT_FEE,
+      currency: 'usd',
+      status: 'succeeded',
+      description: 'One-time deployment fee'
+    });
+
+    logger.info(`✅ Payment record created: ${payment._id}`);
+  } else {
+    logger.info(`ℹ️ Deployment fee waived by coupon: ${couponCode}`);
+  }
 }
 
 async function handleSubscriptionUpdated(stripeSubscription: Stripe.Subscription) {
