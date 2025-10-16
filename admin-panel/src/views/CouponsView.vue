@@ -90,7 +90,7 @@
             <div class="ml-5 w-0 flex-1">
               <dl>
                 <dt class="text-sm font-medium text-gray-500 truncate">Fees Waived</dt>
-                <dd class="text-lg font-semibold text-gray-900">${{ stats.totalFeesWaived.toLocaleString() }}</dd>
+                <dd class="text-lg font-semibold text-gray-900">${{ (stats.totalFeesWaived || 0).toLocaleString() }}</dd>
               </dl>
             </div>
           </div>
@@ -209,9 +209,12 @@
         </tbody>
       </table>
     </div>
+      </main>
+    </div>
 
+    <!-- Modals rendered outside main content for proper z-index -->
     <!-- Create/Edit Coupon Modal -->
-    <div v-if="showCreateModal || showEditModal" class="fixed z-10 inset-0 overflow-y-auto">
+    <div v-if="showCreateModal || showEditModal" class="fixed z-50 inset-0 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModals"></div>
 
@@ -297,7 +300,7 @@
     </div>
 
     <!-- View Coupon Details Modal -->
-    <div v-if="showViewModal && selectedCoupon" class="fixed z-10 inset-0 overflow-y-auto">
+    <div v-if="showViewModal && selectedCoupon" class="fixed z-50 inset-0 overflow-y-auto">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showViewModal = false"></div>
 
@@ -372,8 +375,6 @@
           </div>
         </div>
       </div>
-    </div>
-      </main>
     </div>
   </div>
 </template>
