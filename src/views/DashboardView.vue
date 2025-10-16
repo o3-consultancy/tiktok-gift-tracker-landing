@@ -164,7 +164,10 @@
                   Status
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Access URL
+                  Instance URL
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  API Key
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -184,14 +187,94 @@
                     {{ getStatusLabel(account.status) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <a v-if="account.metadata?.accessUrl" :href="account.metadata.accessUrl" target="_blank" class="text-primary-600 hover:text-primary-700">
-                    Open
-                  </a>
-                  <span v-else class="text-gray-400">Not deployed</span>
+                <!-- Instance URL -->
+                <td class="px-6 py-4 text-sm">
+                  <div v-if="accountCredentials[account._id]?.loading" class="flex items-center space-x-2">
+                    <div class="animate-spin h-4 w-4 border-2 border-primary-600 border-t-transparent rounded-full"></div>
+                    <span class="text-gray-500 text-xs">Loading...</span>
+                  </div>
+                  <div v-else-if="accountCredentials[account._id]?.data?.hasCredentials">
+                    <div v-if="accountCredentials[account._id].data.instanceUrl" class="flex items-center space-x-2">
+                      <a
+                        :href="accountCredentials[account._id].data.instanceUrl"
+                        target="_blank"
+                        class="text-primary-600 hover:text-primary-700 truncate max-w-xs block"
+                      >
+                        {{ accountCredentials[account._id].data.instanceUrl }}
+                      </a>
+                      <button
+                        @click="copyToClipboard(accountCredentials[account._id].data.instanceUrl, 'Instance URL')"
+                        class="text-gray-500 hover:text-gray-700"
+                        title="Copy URL"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <span v-else class="text-gray-400 text-xs">Not configured</span>
+                  </div>
+                  <span v-else class="text-gray-400 text-xs">Not generated</span>
+                </td>
+                <!-- API Key -->
+                <td class="px-6 py-4 text-sm">
+                  <div v-if="accountCredentials[account._id]?.loading" class="flex items-center space-x-2">
+                    <div class="animate-spin h-4 w-4 border-2 border-primary-600 border-t-transparent rounded-full"></div>
+                  </div>
+                  <div v-else-if="accountCredentials[account._id]?.data?.hasCredentials" class="flex items-center space-x-2">
+                    <code v-if="visibleApiKeys[account._id]" class="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                      {{ accountCredentials[account._id].data.apiKey }}
+                    </code>
+                    <code v-else class="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                      ••••••••••••••••
+                    </code>
+                    <button
+                      @click="toggleApiKeyVisibility(account._id)"
+                      class="text-gray-500 hover:text-gray-700"
+                      :title="visibleApiKeys[account._id] ? 'Hide API Key' : 'Show API Key'"
+                    >
+                      <svg v-if="visibleApiKeys[account._id]" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                      <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button
+                      v-if="visibleApiKeys[account._id]"
+                      @click="copyToClipboard(accountCredentials[account._id].data.apiKey, 'API Key')"
+                      class="text-gray-500 hover:text-gray-700"
+                      title="Copy API Key"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <span v-else class="text-gray-400 text-xs">Not generated</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button @click="deleteAccount(account._id)" class="text-red-600 hover:text-red-900">
+                  <!-- Show different buttons based on deployment status -->
+                  <button
+                    v-if="account.disconnectionRequested"
+                    disabled
+                    class="text-yellow-600 opacity-50 cursor-not-allowed"
+                  >
+                    Disconnection Pending
+                  </button>
+                  <button
+                    v-else-if="isAccountDeployed(account._id)"
+                    @click="requestDisconnection(account._id)"
+                    class="text-yellow-600 hover:text-yellow-700"
+                  >
+                    Request Disconnection
+                  </button>
+                  <button
+                    v-else
+                    @click="deleteAccount(account._id)"
+                    class="text-red-600 hover:text-red-900"
+                  >
                     Delete
                   </button>
                 </td>
@@ -288,6 +371,10 @@ const newAccount = ref({
   accountName: ''
 });
 
+// Instance Credentials State (per account)
+const accountCredentials = ref<Record<string, { loading: boolean; data: any }>>({});
+const visibleApiKeys = ref<Record<string, boolean>>({});
+
 const accountLimit = computed(() => {
   return subscriptionStore.subscription?.planDetails?.accounts || 1;
 });
@@ -336,8 +423,28 @@ const fetchAccounts = async () => {
   try {
     const response = await apiService.accounts.getAll();
     accounts.value = response.data.data;
+
+    // Load credentials for each account
+    for (const account of accounts.value) {
+      loadAccountCredentials(account._id);
+    }
   } catch (error) {
     console.error('Error fetching accounts:', error);
+  }
+};
+
+const loadAccountCredentials = async (accountId: string) => {
+  accountCredentials.value[accountId] = { loading: true, data: null };
+
+  try {
+    const response = await apiService.accounts.getInstanceCredentials(accountId);
+    accountCredentials.value[accountId] = {
+      loading: false,
+      data: response.data.data
+    };
+  } catch (error) {
+    console.error(`Error loading credentials for account ${accountId}:`, error);
+    accountCredentials.value[accountId] = { loading: false, data: null };
   }
 };
 
@@ -364,6 +471,26 @@ const handleAddAccount = async () => {
     addAccountError.value = error.response?.data?.message || 'Failed to add account';
   } finally {
     addingAccount.value = false;
+  }
+};
+
+const isAccountDeployed = (accountId: string): boolean => {
+  const creds = accountCredentials.value[accountId]?.data;
+  return !!(creds?.hasCredentials && creds?.apiKey && creds?.instanceUrl);
+};
+
+const requestDisconnection = async (accountId: string) => {
+  if (!confirm('Are you sure you want to request disconnection? This will flag your account for admin review and deletion.')) {
+    return;
+  }
+
+  try {
+    const response = await apiService.accounts.requestDisconnection(accountId);
+    alert(response.data.message);
+    await fetchAccounts();
+  } catch (error: any) {
+    console.error('Error requesting disconnection:', error);
+    alert(error.response?.data?.message || 'Failed to request disconnection');
   }
 };
 
@@ -407,5 +534,20 @@ const handleUpdatePayment = () => {
 const handleLogout = async () => {
   await authStore.logout();
   router.push('/');
+};
+
+// Instance Credentials Functions
+const toggleApiKeyVisibility = (accountId: string) => {
+  visibleApiKeys.value[accountId] = !visibleApiKeys.value[accountId];
+};
+
+const copyToClipboard = async (text: string, label: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert(`${label} copied to clipboard!`);
+  } catch (err) {
+    console.error('Failed to copy:', err);
+    alert('Failed to copy to clipboard');
+  }
 };
 </script>

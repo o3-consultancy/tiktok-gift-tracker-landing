@@ -88,7 +88,9 @@ export const apiService = {
       }
     ) => api.put(`/accounts/${id}`, data),
     delete: (id: string) => api.delete(`/accounts/${id}`),
-    sync: (id: string) => api.post(`/accounts/${id}/sync`)
+    sync: (id: string) => api.post(`/accounts/${id}/sync`),
+    getInstanceCredentials: (id: string) => api.get(`/accounts/${id}/instance-credentials`),
+    requestDisconnection: (id: string) => api.post(`/accounts/${id}/request-disconnection`)
   }
 };
 
