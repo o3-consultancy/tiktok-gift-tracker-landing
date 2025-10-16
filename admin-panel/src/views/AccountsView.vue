@@ -417,16 +417,6 @@ const getDeploymentStatus = (accountId: string) => {
   }
 };
 
-const updateStatus = async (accountId: string, status: string) => {
-  try {
-    await adminApiService.accounts.update(accountId, { status });
-    await loadAccounts(currentPage.value);
-  } catch (err: any) {
-    console.error('Error updating status:', err);
-    alert(err.response?.data?.message || 'Failed to update status');
-  }
-};
-
 const handleDisconnect = async (accountId: string) => {
   if (!confirm('Are you sure you want to disconnect and delete this account? This will:\n\n• Delete the TrackerInstance and all instance data\n• Permanently delete the TikTok account\n\nThis action cannot be undone.')) {
     return;
