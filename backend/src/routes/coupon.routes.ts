@@ -51,6 +51,7 @@ router.post(
     res.json({
       success: true,
       data: {
+        valid: true,
         code: coupon.code,
         description: coupon.description,
         discountType: coupon.discountType,
@@ -185,6 +186,47 @@ router.post(
 );
 
 /**
+ * GET /api/coupons/stats/summary
+ * Get coupon usage statistics
+ * NOTE: This route must be before /:couponId to avoid matching 'stats' as an ID
+ */
+router.get(
+  '/stats/summary',
+  asyncHandler(async (req: Request, res: Response) => {
+    const totalCoupons = await Coupon.countDocuments();
+    const activeCoupons = await Coupon.countDocuments({
+      isActive: true,
+      $or: [
+        { expiresAt: { $exists: false } },
+        { expiresAt: { $gt: new Date() } }
+      ]
+    });
+
+    const totalUsage = await Coupon.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalRedemptions: { $sum: '$usageCount' }
+        }
+      }
+    ]);
+
+    const redemptions = totalUsage[0]?.totalRedemptions || 0;
+    const totalFeesWaived = redemptions * 500; // $500 per coupon
+
+    res.json({
+      success: true,
+      data: {
+        totalCoupons,
+        activeCoupons,
+        totalRedemptions: redemptions,
+        totalFeesWaived
+      }
+    });
+  })
+);
+
+/**
  * GET /api/coupons/:couponId
  * Get coupon details with usage history
  */
@@ -308,47 +350,6 @@ router.delete(
     res.json({
       success: true,
       message: 'Coupon deleted successfully'
-    });
-  })
-);
-
-/**
- * GET /api/coupons/stats/summary
- * Get coupon usage statistics
- */
-router.get(
-  '/stats/summary',
-  asyncHandler(async (req: Request, res: Response) => {
-    const totalCoupons = await Coupon.countDocuments();
-    const activeCoupons = await Coupon.countDocuments({
-      isActive: true,
-      $or: [
-        { expiresAt: { $exists: false } },
-        { expiresAt: { $gt: new Date() } }
-      ]
-    });
-
-    const totalUsage = await Coupon.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalUsed: { $sum: '$usageCount' },
-          totalLimit: { $sum: '$usageLimit' }
-        }
-      }
-    ]);
-
-    const stats = totalUsage[0] || { totalUsed: 0, totalLimit: 0 };
-
-    res.json({
-      success: true,
-      data: {
-        totalCoupons,
-        activeCoupons,
-        totalUsageCount: stats.totalUsed,
-        totalUsageLimit: stats.totalLimit,
-        remainingUses: stats.totalLimit - stats.totalUsed
-      }
     });
   })
 );
