@@ -18,6 +18,7 @@ import subscriptionRoutes from './routes/subscription.routes.js';
 import accountsRoutes from './routes/accounts.routes.js';
 import adminRoutes from './routes/admin.routes.js';  // Admin panel routes
 import couponRoutes from './routes/coupon.routes.js';  // Coupon routes
+import instanceRoutes from './routes/instance.routes.js';  // Instance API routes
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -91,6 +92,7 @@ app.use('/api/subscriptions', apiLimiter, subscriptionRoutes);
 app.use('/api/accounts', apiLimiter, accountsRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);  // Admin panel API
 app.use('/api/coupons', apiLimiter, couponRoutes);  // Coupon API
+app.use('/api/instances', apiLimiter, instanceRoutes);  // Tracker instance API
 
 // 404 handler
 app.use(notFoundHandler);
