@@ -17,6 +17,7 @@ import paymentRoutes from './routes/payment.routes.js';
 import subscriptionRoutes from './routes/subscription.routes.js';
 import accountsRoutes from './routes/accounts.routes.js';
 import adminRoutes from './routes/admin.routes.js';  // Admin panel routes
+import couponRoutes from './routes/coupon.routes.js';  // Coupon routes
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -89,6 +90,7 @@ app.use('/api/payments', paymentRoutes); // No rate limiter on webhook endpoint
 app.use('/api/subscriptions', apiLimiter, subscriptionRoutes);
 app.use('/api/accounts', apiLimiter, accountsRoutes);
 app.use('/api/admin', apiLimiter, adminRoutes);  // Admin panel API
+app.use('/api/coupons', apiLimiter, couponRoutes);  // Coupon API
 
 // 404 handler
 app.use(notFoundHandler);
