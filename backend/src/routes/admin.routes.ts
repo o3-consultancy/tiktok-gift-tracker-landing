@@ -287,7 +287,7 @@ router.get(
           disconnectionRequestedAt: account.disconnectionRequestedAt,
           createdAt: account.createdAt,
           updatedAt: account.updatedAt,
-          user: account.userId ? {
+          user: account.userId && typeof account.userId === 'object' && (account.userId as any).email ? {
             id: (account.userId as any)._id,
             email: (account.userId as any).email,
             displayName: (account.userId as any).displayName
